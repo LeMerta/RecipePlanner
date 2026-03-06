@@ -43,4 +43,4 @@ app-example
 /android
 
 # APi Key
-constants/api.ts
+constants/api_key.ts

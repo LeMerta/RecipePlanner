@@ -1,4 +1,4 @@
-import { OPENAI_API_KEY } from '@/constants/api';
+import { OPENAI_API_KEY } from '@/constants/api_key';
 import { SYSTEM_PROMPT } from '@/constants/systemPrompt';
 import type { AIResponse, Message, OpenAIMessage, Recipe } from '@/types/types';
 
