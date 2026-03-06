@@ -1,4 +1,5 @@
 import type { Message, Recipe, SavedConversation } from '@/types/types';
+import { uuid } from '@/utils/uuid';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -43,7 +44,7 @@ export function useRecipeStorage() {
         .sort((a, b) => b.updatedAt - a.updatedAt);
     } else {
       // Create new entry
-      usedId = crypto.randomUUID();
+      usedId = uuid();
       const newEntry: SavedConversation = { id: usedId, messages, recipe, updatedAt };
       updated = [newEntry, ...savedConversations];
     }

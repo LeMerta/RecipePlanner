@@ -1,5 +1,6 @@
 import { sendToOpenAI } from '@/services/openai';
 import type { Message, Recipe } from '@/types/types';
+import { uuid } from '@/utils/uuid';
 import { useCallback, useState } from 'react';
 
 /**
@@ -23,7 +24,7 @@ export function useRecipeChat() {
       setError(null);
 
       const userMessage: Message = {
-        id: crypto.randomUUID(),
+        id: uuid(),
         role: 'user',
         content: text,
         timestamp: Date.now(),
@@ -35,7 +36,7 @@ export function useRecipeChat() {
         const response = await sendToOpenAI(text, messages, recipe);
 
         const assistantMessage: Message = {
-          id: crypto.randomUUID(),
+          id: uuid(),
           role: 'assistant',
           content: response.message,
           timestamp: Date.now(),

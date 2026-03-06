@@ -2,13 +2,14 @@ import { colors, fonts, fontSizes, radius, spacing } from '@/constants/theme';
 import translations, { type Language } from '@/constants/translations';
 import type { Message } from '@/types/types';
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
 type Props = {
   t: typeof translations[Language];
   messages: Message[];
   isLoading: boolean;
   error: string | null;
+  submitOnEnter?: boolean;
   onSend: (text: string) => void;
 };
 
@@ -16,7 +17,10 @@ function ChatMessage({ message }: { message: Message }) {
   const isUser = message.role === 'user';
   return (
     <View style={[styles.messageRow, isUser && styles.messageRowUser]}>
-      {!isUser && <View style={styles.avatar}><Text style={styles.avatarText}>R</Text></View>}
+      {!isUser && <Image 
+        source={require('@/assets/images/helperProfile.png')}
+        style={styles.avatar}
+      />}
       <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleAssistant]}>
         <Text style={[styles.bubbleText, isUser && styles.bubbleTextUser]}>
           {message.content}
@@ -27,7 +31,7 @@ function ChatMessage({ message }: { message: Message }) {
 }
 
 /** Shows chat history for current recipe */
-export function ChatPanel({ messages, isLoading, error, t,  onSend }: Props) {
+export function ChatPanel({ t, messages, isLoading, error, submitOnEnter=true , onSend }: Props) {
   const [input, setInput] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
@@ -67,7 +71,10 @@ export function ChatPanel({ messages, isLoading, error, t,  onSend }: Props) {
         {/* Loading indicator while waiting for assistant response */}
         {isLoading && (
           <View style={styles.messageRow}>
-            <View style={styles.avatar}><Text style={styles.avatarText}>R</Text></View>
+            <Image 
+              source={require('@/assets/images/helperProfile.png')}
+              style={styles.avatar}
+            />
             <View style={[styles.bubble, styles.bubbleAssistant, styles.loadingBubble]}>
               <ActivityIndicator size="small" color={colors.accent} />
             </View>
@@ -91,8 +98,14 @@ export function ChatPanel({ messages, isLoading, error, t,  onSend }: Props) {
           placeholderTextColor={colors.textMuted}
           multiline
           maxLength={1000}
-          onSubmitEditing={handleSend}
-          blurOnSubmit
+          onKeyPress={(e) => {
+            const event = e.nativeEvent as any;
+            if (submitOnEnter && event.key === 'Enter' && !event.shiftKey) {
+              e.preventDefault?.();
+              handleSend();
+            }
+          }}
+          submitBehavior='newline'
         />
         <Pressable
           style={[styles.sendButton, (!input.trim() || isLoading) && styles.sendButtonDisabled]}
@@ -151,20 +164,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   avatar: {
-    width: 28,
-    height: 28,
+    width: 36,
+    height: 36,
     borderRadius: radius.full,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.accentDim,
-  },
-  avatarText: {
-    color: colors.accent,
-    fontSize: fontSizes.xs,
-    fontWeight: '700',
-    fontFamily: fonts?.sans,
   },
   bubble: {
     maxWidth: '78%',

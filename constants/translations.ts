@@ -30,6 +30,10 @@ const translations = {
     // Chat panel — input
     messagePlaceholder: 'Message...',
 
+    // Mobile tab bar
+    tabChat: 'Chat',
+    tabRecipe: 'Recipe',
+
     // Date formatting
     dateLocale: 'en-US',
   },
@@ -61,6 +65,10 @@ const translations = {
 
     // Chat panel — input
     messagePlaceholder: 'Nachricht...',
+
+    // Mobile tab bar
+    tabChat: 'Chat',
+    tabRecipe: 'Rezept',
 
     // Date formatting
     dateLocale: 'de-DE',

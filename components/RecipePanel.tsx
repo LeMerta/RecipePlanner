@@ -36,17 +36,14 @@ export function RecipePanel({ recipe, t }: Props) {
             <Text style={styles.metaValue}>{recipe.servings}</Text>
             <Text style={styles.metaLabel}>{t.servings}</Text>
           </View>
-          <View style={styles.metaDivider} />
           <View style={styles.metaItem}>
             <Text style={styles.metaValue}>{recipe.prepTimeMinutes}m</Text>
             <Text style={styles.metaLabel}>{t.prep}</Text>
           </View>
-          <View style={styles.metaDivider} />
           <View style={styles.metaItem}>
             <Text style={styles.metaValue}>{recipe.cookTimeMinutes}m</Text>
             <Text style={styles.metaLabel}>{t.cook}</Text>
           </View>
-          <View style={styles.metaDivider} />
           <View style={styles.metaItem}>
             <Text style={styles.metaValue}>{totalTime}m</Text>
             <Text style={styles.metaLabel}>{t.total}</Text>
@@ -134,16 +131,16 @@ const styles = StyleSheet.create({
   },
   meta: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
     backgroundColor: colors.backgroundElevated,
     borderRadius: radius.md,
-    padding: spacing.lg,
+    paddingVertical: spacing.lg,
     marginBottom: spacing.xxl,
-    gap: 0,
   },
   metaItem: {
-    flex: 1,
+    width: '50%',
     alignItems: 'center',
+    paddingVertical: spacing.sm,
     gap: spacing.xs,
   },
   metaValue: {
@@ -158,11 +155,6 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1,
     fontFamily: fonts?.sans,
-  },
-  metaDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: colors.surfaceElevated,
   },
   sectionTitle: {
     color: colors.accent,
