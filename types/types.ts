@@ -1,3 +1,5 @@
+// types for hooks and services
+
 // ─── Chat ────────────────────────────────────────────────────────────────────
 
 export type MessageRole = 'user' | 'assistant';
@@ -33,4 +35,18 @@ export type Recipe = {
 export type AIResponse = {
   message: string;       // conversational reply shown in chat
   recipe: Recipe | null; // null if still clarifying
+};
+
+export type OpenAIMessage = {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+};
+
+// ─── StorageEntry ────────────────────────────────────────────────────────────
+
+export type SavedConversation = {
+  id: string;
+  updatedAt: number;
+  messages: Message[];
+  recipe: Recipe | null; // null if user never got to a recipe
 };

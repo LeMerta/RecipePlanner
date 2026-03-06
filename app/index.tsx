@@ -1,80 +1,107 @@
+import { ChatPanel } from '@/components/ChatPanel';
+import { ConversationSidebar } from '@/components/ConversationSidebar';
+import { RecipePanel } from '@/components/RecipePanel';
+import { colors, fonts, fontSizes, spacing } from '@/constants/theme';
+import translations, { type Language } from '@/constants/translations';
 import { useRecipeChat } from '@/hooks/useRecipeChat';
-import React from 'react';
-import { ActivityIndicator, Button, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useRecipeStorage } from '@/hooks/useRecipeStorage';
+import type { SavedConversation } from '@/types/types';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-export default function HomePage() {
-  const { messages, recipe, isLoading, sendMessage } = useRecipeChat();
-  const [input, setInput] = React.useState('');
+/** This is the main and only page of the app */
+export default function Index() {
+  const {
+    messages,
+    recipe,
+    isLoading,
+    error,
+    currentConversationId,
+    setCurrentConversationId,
+    sendMessage,
+    resetChat,
+    loadConversation,
+  } = useRecipeChat();
 
-  async function send() {
-    if (!input.trim()) return;
-    setInput('');
-    await sendMessage(input);
-  }
+  const { savedConversations, saveConversation, deleteConversation } = useRecipeStorage();
+
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [language, setLanguage] = useState<Language>('en');     // decides language of text on site
+  const t = translations[language];                           // holds translated texts
+
+  // Auto-save whenever messages or recipe changes
+  useEffect(() => {
+    if (messages.length > 0) {
+      saveConversation(messages, recipe, currentConversationId).then(id => {
+        if (!currentConversationId) setCurrentConversationId(id);
+      });
+    }
+  }, [messages, recipe, saveConversation]);
+
+  const handleNewChat = () => {
+    resetChat();
+    setSidebarOpen(false);
+  };
+
+  const handleSelectConversation = (conversation: SavedConversation) => {
+    loadConversation(conversation.messages, conversation.recipe, conversation.id);
+    setSidebarOpen(false);
+  };
+
+  const handleDeleteConversation = (id: string) => {
+    deleteConversation(id);
+    if (currentConversationId === id) handleNewChat();
+  };
 
   return (
-    <View style={styles.container}>
-      {/* ── Left: Recipe Panel ── */}
-      <View style={styles.left}>
-        <Text style={styles.leftTitle}>Recipe</Text>
-        <ScrollView style={styles.leftContent}>
-          {recipe ? (
-            <>
-              <Text style={styles.recipeTitle}>{recipe.title}</Text>
-              <Text style={styles.recipeDescription}>{recipe.description}</Text>
+    <View style={styles.root}>
+      <ConversationSidebar 
+        t={t}
+        visible={sidebarOpen}
+        conversations={savedConversations}
+        activeId={currentConversationId}
+        onSelect={handleSelectConversation}
+        onDelete={handleDeleteConversation}
+        onNewChat={handleNewChat}
+      />
+      {/* Closes sidebar when tapping outside */}
+      {sidebarOpen && (
+        <Pressable style={styles.overlay} onPress={() => setSidebarOpen(false)} />
+      )}
 
-              <Text style={styles.sectionTitle}>
-                {recipe.servings} servings · {recipe.prepTimeMinutes}min prep · {recipe.cookTimeMinutes}min cook
-              </Text>
+      <View style={styles.main}>
+        <View style={styles.topBar}>
+          {/* Opens sidebar */}
+          <Pressable style={styles.menuButton} onPress={() => setSidebarOpen(v => !v)}>
+            <Text style={styles.menuIcon}>☰</Text>
+          </Pressable>
+          {/* site title */}
+          <Text style={styles.appTitle}>{t.appTitle}</Text>
+          {/* Toggle for choosing language */}
+          <View style={styles.langToggle}>
+            <Pressable onPress={() => setLanguage('en')}>
+              <Text style={[styles.langOption, language === 'en' && styles.langActive]}>EN</Text>
+            </Pressable>
+            <Text style={styles.langDivider}>|</Text>
+            <Pressable onPress={() => setLanguage('de')}>
+              <Text style={[styles.langOption, language === 'de' && styles.langActive]}>DE</Text>
+            </Pressable>
+          </View>
+        </View>
 
-              <Text style={styles.sectionTitle}>Ingredients</Text>
-              {recipe.ingredients.map((ing, i) => (
-                <Text key={i} style={styles.recipeText}>
-                  · {ing.amount}{ing.unit ? ` ${ing.unit}` : ''} {ing.name}
-                </Text>
-              ))}
-
-              <Text style={styles.sectionTitle}>Steps</Text>
-              {recipe.steps.map((step, i) => (
-                <Text key={i} style={styles.recipeText}>
-                  {i + 1}. {step}
-                </Text>
-              ))}
-            </>
-          ) : (
-            <Text style={{ color: '#666' }}>Recipe from the conversation will appear here.</Text>
-          )}
-        </ScrollView>
-      </View>
-
-      {/* ── Right: Chat Panel ── */}
-      <View style={styles.right}>
-        <ScrollView style={styles.messages} contentContainerStyle={styles.messagesContainer}>
-          {messages.map((m) => (
-            <View key={m.id} style={[styles.messageBubble, m.role === 'user' ? styles.userMessage : styles.assistantMessage]}>
-              <Text style={styles.messageRole}>{m.role === 'user' ? 'You' : 'Assistant'}</Text>
-              <Text style={[styles.message, m.role === 'user' && { color: '#fff' }]}>{m.content}</Text>
-            </View>
-          ))}
-          {isLoading && (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="small" color="#0066cc" />
-              <Text style={styles.loadingText}>Assistant is typing...</Text>
-            </View>
-          )}
-        </ScrollView>
-
-        <View style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            value={input}
-            onChangeText={setInput}
-            placeholder="Type a message..."
-            onSubmitEditing={send}
-            returnKeyType="send"
-            editable={!isLoading}
-          />
-          <Button title="Send" onPress={send} disabled={isLoading} />
+        <View style={styles.content}>
+          <View style={styles.recipePane}>
+            <RecipePanel t={t} recipe={recipe} />
+          </View>
+          <View style={styles.chatPane}>
+            <ChatPanel
+              messages={messages}
+              isLoading={isLoading}
+              error={error}
+              onSend={sendMessage}
+              t={t}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -82,24 +109,78 @@ export default function HomePage() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, flexDirection: 'row' },
-  left: { flex: 1, borderRightWidth: 1, borderRightColor: '#ddd', padding: 16, backgroundColor: '#f7f7f7' },
-  leftTitle: { fontSize: 18, fontWeight: '700', marginBottom: 8 },
-  leftContent: { flex: 1 },
-  recipeTitle: { fontSize: 16, fontWeight: '700', marginBottom: 4 },
-  recipeDescription: { fontSize: 13, color: '#555', marginBottom: 12, lineHeight: 18 },
-  sectionTitle: { fontSize: 13, fontWeight: '600', color: '#444', marginTop: 12, marginBottom: 4 },
-  recipeText: { fontSize: 14, lineHeight: 22 },
-  right: { flex: 1, display: 'flex', flexDirection: 'column' },
-  messages: { flex: 1, padding: 16, backgroundColor: '#fff' },
-  messagesContainer: { paddingBottom: 16 },
-  messageBubble: { marginBottom: 12, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, maxWidth: '80%' },
-  userMessage: { alignSelf: 'flex-end', backgroundColor: '#0066cc' },
-  assistantMessage: { alignSelf: 'flex-start', backgroundColor: '#e8e8e8' },
-  messageRole: { fontSize: 12, fontWeight: '600', marginBottom: 4, color: '#666' },
-  message: { fontSize: 14, lineHeight: 20, color: '#000' },
-  loadingContainer: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 },
-  loadingText: { fontSize: 14, color: '#666' },
-  inputRow: { flexDirection: 'row', padding: 12, borderTopWidth: 1, borderTopColor: '#eee', alignItems: 'center' },
-  input: { flex: 1, marginRight: 8, paddingVertical: 8, paddingHorizontal: 12, borderWidth: 1, borderColor: '#ddd', borderRadius: 6, backgroundColor: '#fff' },
+  root: {
+    flex: 1,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+  },
+  overlay: {
+    position: 'absolute',
+    inset: 0,
+    backgroundColor: '#00000066',
+    zIndex: 99,
+  },
+  main: {
+    width: '80%',
+    maxWidth: 1200,
+    flex: 1,
+  },
+  topBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  menuButton: {
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuIcon: {
+    color: colors.textMuted,
+    fontSize: fontSizes.xl,
+  },
+  appTitle: {
+    color: colors.textPrimary,
+    fontSize: fontSizes.body,
+    fontWeight: '700',
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    fontFamily: fonts?.sans,
+  },
+  content: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  recipePane: {
+    flex: 1,
+    borderRightWidth: 1,
+    borderRightColor: colors.border,
+  },
+  chatPane: {
+    flex: 1,
+  },
+  langToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  langOption: {
+    color: colors.textDisabled,
+    fontSize: fontSizes.md,
+    fontWeight: '700',
+    letterSpacing: 1,
+    fontFamily: fonts?.sans,
+  },
+  langActive: {
+    color: colors.accent,
+  },
+  langDivider: {
+    color: colors.borderStrong,
+    fontSize: fontSizes.md,
+  },
 });

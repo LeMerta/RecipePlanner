@@ -1,53 +1,73 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
-
-export const Colors = {
-  light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
-  },
-  dark: {
-    text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
-    icon: '#9BA1A6',
-    tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
-  },
-};
-
-export const Fonts = Platform.select({
+export const fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
-    sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
-    rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
+    sans: 'system-ui',
     mono: 'ui-monospace',
   },
   default: {
-    sans: 'normal',
     serif: 'serif',
-    rounded: 'normal',
+    sans: 'normal',
     mono: 'monospace',
   },
   web: {
-    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     serif: "Georgia, 'Times New Roman', serif",
-    rounded: "'SF Pro Rounded', 'Hiragino Maru Gothic ProN', Meiryo, 'MS PGothic', sans-serif",
-    mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+    sans: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    mono: "Menlo, Monaco, Consolas, 'Courier New', monospace",
   },
 });
+
+export const colors = {
+  // Backgrounds
+  background: '#0a0a0a',
+  backgroundElevated: '#0f0f0f',
+  surface: '#2f2e2e',
+  surfaceElevated: '#1e1e1e',
+
+  // Text
+  textPrimary: '#e8e0d0',
+  textSecondary: '#a6a3a3',
+  textMuted: '#868585',
+  textDisabled: '#333',
+
+  // Accent
+  accent: '#c8a96e',
+  accentDim: '#c8a96e44',
+
+  // Borders
+  border: '#1a1a1a',
+  borderStrong: '#404040',
+
+  // Semantic
+  error: '#ff6b6b',
+  errorBackground: '#2a0f0f',
+  errorBorder: '#5a1a1a',
+} as const;
+
+export const fontSizes = {
+  xs: 11,
+  sm: 12,
+  md: 13,
+  body: 14,
+  lg: 16,
+  xl: 20,
+  xxl: 24,
+  title: 28,
+} as const;
+
+export const spacing = {
+  xs: 4,
+  sm: 8,
+  md: 12,
+  lg: 16,
+  xl: 24,
+  xxl: 32,
+} as const;
+
+export const radius = {
+  sm: 4,
+  md: 8,
+  lg: 12,
+  full: 999,
+} as const;
