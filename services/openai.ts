@@ -1,4 +1,4 @@
-import { OPENAI_API_KEY } from '@/constants/api_key';
+export const OPENAI_API_KEY = process.env.EXPO_PUBLIC_OPENAI_API_KEY;
 import { SYSTEM_PROMPT } from '@/constants/systemPrompt';
 import type { AIResponse, Message, OpenAIMessage, Recipe } from '@/types/types';
 
