@@ -6,6 +6,7 @@ import translations, { type Language } from '@/constants/translations';
 import type { Message, Recipe, SavedConversation } from '@/types/types';
 import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Tab = 'chat' | 'recipe';
 
@@ -63,92 +64,98 @@ export function MobileLayout({
       style={styles.root} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ConversationSidebar
-        t={t}
-        visible={sidebarOpen}
-        conversations={savedConversations}
-        activeId={currentConversationId}
-        onSelect={(conversation) => {       
-          setRecipeUnread(false);       // remove dot from unread recipe
-          skipNextRecipeRef.current = true; // skip the recipe change from loading
-          onSelectConversation(conversation);
-        }}
-        onDelete={onDeleteConversation}
-        onNewChat={onNewChat}
-      />
+      <SafeAreaView style={styles.safeArea}>
+        <ConversationSidebar
+          t={t}
+          visible={sidebarOpen}
+          conversations={savedConversations}
+          activeId={currentConversationId}
+          onSelect={(conversation) => {       
+            setRecipeUnread(false);       // remove dot from unread recipe
+            skipNextRecipeRef.current = true; // skip the recipe change from loading
+            onSelectConversation(conversation);
+          }}
+          onDelete={onDeleteConversation}
+          onNewChat={onNewChat}
+        />
 
-      {/* Closes sidebar when tapping outside */}
-      {sidebarOpen && (
-        <Pressable style={styles.overlay} onPress={onCloseSidebar} />
-      )}
+        {/* Closes sidebar when tapping outside */}
+        {sidebarOpen && (
+          <Pressable style={styles.overlay} onPress={onCloseSidebar} />
+        )}
 
-      {/* Header */}
-      <View style={styles.topBar}>
-        {/* Opens sidebar */}
-        <Pressable style={styles.menuButton} onPress={onToggleSidebar}>
-          <Text style={styles.menuIcon}>☰</Text>
-        </Pressable>
-
-        {/* Site title */}
-        <Text style={styles.appTitle}>{t.appTitle}</Text>
-
-        {/* Toggle for choosing language */}
-        <View style={styles.langToggle}>
-          <Pressable onPress={() => onSetLanguage('en')}>
-            <Text style={[styles.langOption, language === 'en' && styles.langActive]}>EN</Text>
+        {/* Header */}
+        <View style={styles.topBar}>
+          {/* Opens sidebar */}
+          <Pressable style={styles.menuButton} onPress={onToggleSidebar}>
+            <Text style={styles.menuIcon}>☰</Text>
           </Pressable>
-          <Text style={styles.langDivider}>|</Text>
-          <Pressable onPress={() => onSetLanguage('de')}>
-            <Text style={[styles.langOption, language === 'de' && styles.langActive]}>DE</Text>
+
+          {/* Site title */}
+          <Text style={styles.appTitle}>{t.appTitle}</Text>
+
+          {/* Toggle for choosing language */}
+          <View style={styles.langToggle}>
+            <Pressable onPress={() => onSetLanguage('en')}>
+              <Text style={[styles.langOption, language === 'en' && styles.langActive]}>EN</Text>
+            </Pressable>
+            <Text style={styles.langDivider}>|</Text>
+            <Pressable onPress={() => onSetLanguage('de')}>
+              <Text style={[styles.langOption, language === 'de' && styles.langActive]}>DE</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Tab bar */}
+        <View style={styles.tabBar}>
+          <Pressable
+            style={[styles.tab, activeTab === 'chat' && styles.tabActive]}
+            onPress={() => setActiveTab('chat')}
+          >
+            <Text style={[styles.tabText, activeTab === 'chat' && styles.tabTextActive]}>
+              {t.tabChat}
+            </Text>
+          </Pressable>
+          <Pressable
+            style={[styles.tab, activeTab === 'recipe' && styles.tabActive]}
+            onPress={() => {
+              setActiveTab('recipe');
+              setRecipeUnread(false);
+            }}
+          >
+            <Text style={[styles.tabText, activeTab === 'recipe' && styles.tabTextActive]}>
+              {t.tabRecipe}
+            </Text>
+            {recipeUnread && <View style={styles.recipeDot} />}
           </Pressable>
         </View>
-      </View>
 
-      {/* Tab bar */}
-      <View style={styles.tabBar}>
-        <Pressable
-          style={[styles.tab, activeTab === 'chat' && styles.tabActive]}
-          onPress={() => setActiveTab('chat')}
-        >
-          <Text style={[styles.tabText, activeTab === 'chat' && styles.tabTextActive]}>
-            {t.tabChat}
-          </Text>
-        </Pressable>
-        <Pressable
-          style={[styles.tab, activeTab === 'recipe' && styles.tabActive]}
-          onPress={() => {
-            setActiveTab('recipe');
-            setRecipeUnread(false);
-          }}
-        >
-          <Text style={[styles.tabText, activeTab === 'recipe' && styles.tabTextActive]}>
-            {t.tabRecipe}
-          </Text>
-          {recipeUnread && <View style={styles.recipeDot} />}
-        </Pressable>
-      </View>
-
-      {/* Active panel */}
-      <View style={styles.content}>
-        {activeTab === 'chat' ? (
-          <ChatPanel
-            messages={messages}
-            isLoading={isLoading}
-            error={error}
-            onSend={onSend}
-            t={t}
-            submitOnEnter={false}
-          />
-        ) : (
-          <RecipePanel recipe={recipe} t={t} />
-        )}
-      </View>
+        {/* Active panel */}
+        <View style={styles.content}>
+          {activeTab === 'chat' ? (
+            <ChatPanel
+              messages={messages}
+              isLoading={isLoading}
+              error={error}
+              onSend={onSend}
+              t={t}
+              submitOnEnter={false}
+            />
+          ) : (
+            <RecipePanel recipe={recipe} t={t} />
+          )}
+        </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   root: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  safeArea: {
     flex: 1,
     backgroundColor: colors.background,
   },

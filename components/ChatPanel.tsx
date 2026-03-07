@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: spacing.md,
     color: colors.textPrimary,
-    fontSize: fontSizes.body,
+    fontSize: fontSizes.lg,
     maxHeight: 120,
     lineHeight: 21,
     fontFamily: fonts?.sans,
