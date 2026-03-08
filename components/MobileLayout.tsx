@@ -49,6 +49,8 @@ export function MobileLayout({
   const skipNextRecipeRef = useRef(false);      // to prevent loading an old recipe setting dot on recipe tab
   const insets = useSafeAreaInsets();           // Device-specific insets for notch, status bar and home indicator
 
+  console.log('insets:', insets);
+
   // Mark recipe as unread when it changes and we're not on the recipe tab
   useEffect(() => {
     if (skipNextRecipeRef.current) {
@@ -63,7 +65,7 @@ export function MobileLayout({
   return (
     <SafeAreaProvider>
       <KeyboardAvoidingView 
-        style={[styles.root, { paddingTop: insets.top }]}
+        style={styles.root}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={insets.top}
       >
@@ -133,7 +135,7 @@ export function MobileLayout({
         </View>
 
         {/* Active panel */}
-        <View style={[styles.content, { paddingBottom: insets.bottom }]}>
+        <View style={styles.content}>
           {activeTab === 'chat' ? (
             <ChatPanel
               messages={messages}
