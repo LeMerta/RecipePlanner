@@ -6,7 +6,7 @@ import translations, { type Language } from '@/constants/translations';
 import type { Message, Recipe, SavedConversation } from '@/types/types';
 import { useEffect, useRef, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type Tab = 'chat' | 'recipe';
 
@@ -47,6 +47,7 @@ export function MobileLayout({
   const [activeTab, setActiveTab] = useState<Tab>('chat');
   const [recipeUnread, setRecipeUnread] = useState(false);        // to show dot if user has seen latest recipe
   const skipNextRecipeRef = useRef(false);      // to prevent loading an old recipe setting dot on recipe tab
+  const insets = useSafeAreaInsets();           // Device-specific insets for notch, status bar and home indicator
 
   // Mark recipe as unread when it changes and we're not on the recipe tab
   useEffect(() => {
@@ -60,11 +61,12 @@ export function MobileLayout({
   }, [recipe]);
 
   return (
-    <KeyboardAvoidingView 
-      style={styles.root} 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <SafeAreaView style={styles.safeArea}>
+    <SafeAreaProvider>
+      <KeyboardAvoidingView 
+        style={[styles.root, { paddingTop: insets.top }]}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={insets.top}
+      >
         <ConversationSidebar
           t={t}
           visible={sidebarOpen}
@@ -131,7 +133,7 @@ export function MobileLayout({
         </View>
 
         {/* Active panel */}
-        <View style={styles.content}>
+        <View style={[styles.content, { paddingBottom: insets.bottom }]}>
           {activeTab === 'chat' ? (
             <ChatPanel
               messages={messages}
@@ -145,8 +147,8 @@ export function MobileLayout({
             <RecipePanel recipe={recipe} t={t} />
           )}
         </View>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
+    </SafeAreaProvider>
   );
 }
 

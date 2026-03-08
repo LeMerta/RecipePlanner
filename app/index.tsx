@@ -74,7 +74,7 @@ export default function Index() {
     onSetLanguage: setLanguage,
   };
 
-  return isMobile
+  return isMobile 
     ? <MobileLayout {...layoutProps} />
     : <WebLayout {...layoutProps} />;
 }
