@@ -49,8 +49,6 @@ export function MobileLayout({
   const skipNextRecipeRef = useRef(false);      // to prevent loading an old recipe setting dot on recipe tab
   const insets = useSafeAreaInsets();           // Device-specific insets for notch, status bar and home indicator
 
-  console.log('insets:', insets);
-
   // Mark recipe as unread when it changes and we're not on the recipe tab
   useEffect(() => {
     if (skipNextRecipeRef.current) {
