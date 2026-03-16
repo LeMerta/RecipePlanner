@@ -25,7 +25,7 @@ const translations = {
 
     // Chat panel — welcome state
     welcomeTitle: 'What are we cooking?',
-    welcomeSubtitle: "Describe a dish, dietary preference, or just say what's in your fridge.",
+    welcomeSubtitle: "Describe a dish or ingredients and I'll suggest a recipe for you.",
 
     // Chat panel — input
     messagePlaceholder: 'Message...',
@@ -61,7 +61,7 @@ const translations = {
 
     // Chat panel — welcome state
     welcomeTitle: 'Was kochen wir?',
-    welcomeSubtitle: 'Beschreibe ein Gericht, deine Ernährungsweise, oder sag einfach was du im Kühlschrank hast.',
+    welcomeSubtitle: 'Beschreibe ein Gericht oder Zutaten und erhalte einen Rezeptvorschlag',
 
     // Chat panel — input
     messagePlaceholder: 'Nachricht...',
