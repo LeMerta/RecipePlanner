@@ -1,7 +1,9 @@
 import { colors, fonts, fontSizes, radius, spacing } from '@/constants/theme';
 import translations, { type Language } from '@/constants/translations';
 import type { Recipe } from '@/types/types';
+import { useRef } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { CaptureButton } from './CaptureButton';
 
 type Props = {
   recipe: Recipe | null;
@@ -10,6 +12,8 @@ type Props = {
 
 /** Displays current recipe or default message if not existent */
 export function RecipePanel({ recipe, t }: Props) {
+  const captureRef = useRef<View>(null);      // ref to the recipe content View for html2canvas capture
+
   if (!recipe) {
     return (
       <View style={styles.empty}>
@@ -24,10 +28,13 @@ export function RecipePanel({ recipe, t }: Props) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.inner}>
+      <View style={styles.inner} ref={captureRef}>
 
-        {/* Title */}
-        <Text style={styles.title}>{recipe.title}</Text>
+        {/* Title row */}
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{recipe.title}</Text>
+          <CaptureButton targetRef={captureRef} />
+        </View>
         <Text style={styles.description}>{recipe.description}</Text>
 
         {/* Meta row */}
@@ -88,7 +95,6 @@ const styles = StyleSheet.create({
   },
   inner: {
     padding: spacing.xxl,
-    maxWidth: 520,
   },
   empty: {
     flex: 1,
@@ -113,14 +119,21 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.md,
     fontFamily: fonts?.sans,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: spacing.lg,
+    marginBottom: spacing.md,
+  },
   title: {
     color: colors.textPrimary,
     fontSize: fontSizes.title,
     fontWeight: '700',
     letterSpacing: -0.5,
-    marginBottom: spacing.md,
     lineHeight: 34,
     fontFamily: fonts?.serif,
+    flex: 1,  
   },
   description: {
     color: colors.textSecondary,

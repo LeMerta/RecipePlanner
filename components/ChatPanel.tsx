@@ -1,6 +1,7 @@
 import { colors, fonts, fontSizes, radius, spacing } from '@/constants/theme';
 import translations, { type Language } from '@/constants/translations';
 import type { Message } from '@/types/types';
+import { Ionicons } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -107,12 +108,17 @@ export function ChatPanel({ t, messages, isLoading, error, submitOnEnter=true , 
           }}
           submitBehavior='newline'
         />
+        {/* Sendbutton */}
         <Pressable
           style={[styles.sendButton, (!input.trim() || isLoading) && styles.sendButtonDisabled]}
           onPress={handleSend}
           disabled={!input.trim() || isLoading}
         >
-          <Text style={[styles.sendButtonText, (!input.trim() || isLoading) && styles.sendButtonTextDisabled]}>↑</Text>
+          <Ionicons
+            name="send"
+            size={16}
+            color={(!input.trim() || isLoading) ? colors.textMuted : colors.background}
+          />
         </Pressable>
       </View>
     </View>
@@ -242,13 +248,5 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     backgroundColor: colors.surface,
-  },
-  sendButtonTextDisabled: {
-    color: colors.textMuted,
-  },
-  sendButtonText: {
-    color: colors.backgroundElevated,
-    fontSize: fontSizes.lg,
-    fontWeight: '700',
   },
 });
